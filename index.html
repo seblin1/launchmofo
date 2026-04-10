@@ -963,26 +963,26 @@
           <div class="form-row">
             <div class="form-group">
               <label for="name">Your Name</label>
-              <input type="text" id="name" placeholder="John Smith" required />
+              <input type="text" id="name" name="name" placeholder="John Smith" required />
             </div>
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input type="email" id="email" placeholder="john@yourbusiness.com" required />
+              <input type="email" id="email" name="email" placeholder="john@yourbusiness.com" required />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label for="phone">Phone Number</label>
-              <input type="tel" id="phone" placeholder="+1 (619) 000 0000" />
+              <input type="tel" id="phone" name="phone" placeholder="+1 (619) 000 0000" />
             </div>
             <div class="form-group">
               <label for="business">Business Name</label>
-              <input type="text" id="business" placeholder="Smith Plumbing" required />
+              <input type="text" id="business" name="business" placeholder="Smith Plumbing" required />
             </div>
           </div>
           <div class="form-group">
             <label for="industry">What Industry Are You In?</label>
-            <select id="industry">
+            <select id="industry" name="industry">
               <option value="" disabled selected>Select your industry</option>
               <option>Contractors (Plumbing, Electrical, HVAC, etc.)</option>
               <option>Construction / Renovation</option>
@@ -999,14 +999,14 @@
           </div>
           <div class="form-group">
             <label for="description">What Does Your Business Do?</label>
-            <textarea id="description" placeholder="We fix leaky pipes and broken dreams across San Diego County..."></textarea>
+            <textarea id="description" name="description" placeholder="We fix leaky pipes and broken dreams across San Diego County..."></textarea>
           </div>
           <div class="form-group">
             <label for="extras">Anything Else We Should Know?</label>
-            <textarea id="extras" placeholder="Got a logo? Existing site? Specific colors? Tell us here." style="min-height:80px;"></textarea>
+            <textarea id="extras" name="extras" placeholder="Got a logo? Existing site? Specific colors? Tell us here." style="min-height:80px;"></textarea>
           </div>
           <div class="form-submit">
-            <button class="btn-primary" onclick="submitForm()">Submit — Let's Build This</button>
+            <button class="btn-primary" onclick="submitForm(event)">Submit — Let's Build This</button>
           </div>
           <p class="form-note">We'll confirm within 24 hours. Payment collected before build begins.</p>
         </div>
@@ -1039,7 +1039,8 @@
     });
 
     // Form submit
-    function submitForm() {
+    async function submitForm(e) {
+      e.preventDefault();
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const business = document.getElementById('business').value.trim();
@@ -1049,8 +1050,32 @@
         return;
       }
 
-      document.getElementById('contact-form').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
+      const data = {
+        name,
+        email,
+        phone: document.getElementById('phone').value,
+        business,
+        industry: document.getElementById('industry').value,
+        description: document.getElementById('description').value,
+        extras: document.getElementById('extras').value,
+      };
+
+      try {
+        const response = await fetch('https://formspree.io/f/mjgpqdzz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          document.getElementById('contact-form').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          alert('Something went wrong. Please try again or email hello@launchmofo.com');
+        }
+      } catch (err) {
+        alert('Something went wrong. Please try again or email hello@launchmofo.com');
+      }
     }
   </script>
 
